@@ -1,7 +1,10 @@
 import csv
 import os.path
 import ofxparse
+from openpyxl import load_workbook
+
 import support
+import openpyxl
 import datetime
 
 # Exemplos
@@ -56,24 +59,28 @@ statement.transactions  # A list of InvestmentTransaction objects
 rows = []
 for transaction in statement.transactions:
     # print(date_time)
-    rows.append(('', '',  institution.organization + " " + account.number, '',
+    rows.append(('', '', institution.organization + " " + account.number, '',
                  transaction.memo, '', '', transaction.date,
                  transaction.amount, '', 'BRL', ''))
 
-    #print(transaction.payee)
-    #print(transaction.type)
-    #print(transaction.date)
+    # print(transaction.payee)
+    # print(transaction.type)
+    # print(transaction.date)
     # transaction.user_date
-    #print(transaction.amount)
-    #print(transaction.id)
-    #print(transaction.memo)
-    #print(transaction.sic)
-    #print(transaction.mcc)
-    #print(transaction.checknum)
+    # print(transaction.amount)
+    # print(transaction.id)
+    # print(transaction.memo)
+    # print(transaction.sic)
+    # print(transaction.mcc)
+    # print(transaction.checknum)
 
 for i in rows:
     print(i)
 
+""""""""""""""""""""""""""""""
+""" Inserindo dados no CSV """
+""""""""""""""""""""""""""""""
+"""
 if os.path.exists('dados.csv'):
     with open('dados.csv', 'a', newline='', encoding='utf-8') as arq:
         dados = csv.writer(arq, lineterminator='\n', delimiter=';')
@@ -85,3 +92,28 @@ else:
             ['Nome', 'Saldo atual', 'Conta', 'Transferências', 'Descrição', 'Beneficiário', 'Categoria',
              'Data', 'Tempo', 'Valor', 'Câmbio', 'Número do cheque', 'Saldo'])
         dados.writerows(rows)
+"""
+""""""""""""""""""""""""""""""""
+""" Inserindo dados no EXCEL """
+""""""""""""""""""""""""""""""""
+
+wb = load_workbook('controle.xlsx')
+print(wb.sheetnames)
+wb1 = wb["Fluxo_Caixa"]
+
+
+for x in range(1, len(rows)):
+    for y in range(1, len(rows[x])):
+        wb1.cell(row=x, column=y, value=rows[x][y])
+
+wb.save("C:/Users/paulo.passos/PycharmProjects/ControleFinanceiro/controle.xlsx")
+
+
+
+"""
+#n = 0
+#wb = openpyxl.load_workbook('D:\excel.xlsx')
+#sheets = wb.sheetnames
+#ws = wb[sheets[n]]
+
+"""

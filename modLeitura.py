@@ -29,10 +29,14 @@ def inserirDadosCSV(listaOFX):
         conta = retornarNomeConta(account.account_id)
         print(banco,conta)
         rows = []
+
+
         for transaction in statement.transactions:
-            # print(date_time)
+            date = transaction.date
+            data = date.strftime("%d/%m/%Y")
+
             rows.append(('', '', banco + " " + conta, '',
-                         transaction.memo, '', '', transaction.date,
+                         transaction.memo, '', '', data,
                          transaction.amount, '', 'BRL', ''))
 
         if os.path.exists('dados.csv'):
@@ -79,12 +83,6 @@ def inserirTabelaExcel(row, arquivoXLSX, sheet):
     for x in range(0, len(row)):
         for y in range(0, len(row[x])):
             wb1.cell(row=x+1, column=y+1, value=row[x][y])
-
-    dv = DataValidation(type="list", formula1='"Dog,Cat,Bat"', allow_blank=True)
-    #dv.error('Você inseriu um valor que não está na lista de categorias')
-    #dv.errorTitle('Entranda inválida')
-    #dv.add('Fluxo_Caixa!G2:G8000')
-
     wb.save(arquivoXLSX)
 
 def  retornarListaOperCSV(arquivo):

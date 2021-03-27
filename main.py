@@ -1,119 +1,15 @@
-import csv
-import os.path
-import ofxparse
-from openpyxl import load_workbook
+import os
+import modLeitura
 
-import support
-import openpyxl
-import datetime
+def main():
+    #listaOFX = modLeitura.retornarListarArqsOFX('/Volumes/APFS10/FINANCEIRO/OFXs/')
+    #modLeitura.inserirDadosCSV(listaOFX)
+    tabelaFluxoCaixa = modLeitura.retornarListaOperCSV('dados.csv')
 
-# Exemplos
-# https://python.hotexamples.com/pt/examples/ofxparse.ofxparse/OfxParser/-/python-ofxparser-class-examples.html
-# https://programtalk.com/vs2/python/6616/ofxparse/tests/test_parse.py/
-ofx = ofxparse.OfxParser.parse(support.open_file('file.ofx'))
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # Pega a pasta do projeto
+    # print(ROOT_DIR)
+    arquivo = ROOT_DIR + '/' + 'controle.xlsx'
+    modLeitura.inserirTabelaExcel(tabelaFluxoCaixa, arquivo , "Fluxo_Caixa")
 
-# AccountType
-# (Unknown, Bank, CreditCard, Investment)
-
-# Account
-
-account = ofx.account
-print(account.account_id)  # The account number
-print(account.number)  # The account number (deprecated -- returns account_id)
-print(account.routing_number)  # The bank routing number
-account.branch_id  # Transit ID / branch number
-print(account.type)  # An AccountType object
-account.statement  # A Statement object
-account.institution  # An Institution object
-
-# InvestmentAccount(Account)
-
-# account.brokerid          # Investment broker ID
-account.statement  # An InvestmentStatement object
-
-# Institution
-
-institution = account.institution
-print(institution.organization)
-print(institution.fid)
-
-# Statement
-
-statement = account.statement
-statement.start_date  # The start date of the transactions
-statement.end_date  # The end date of the transactions
-statement.balance  # The money in the account as of the statement date
-# statement.available_balance   # The money available from the account as of the statement date
-statement.transactions  # A list of Transaction objects
-
-# InvestmentStatement
-
-statement = account.statement
-# statement.positions           # A list of Position objects
-statement.transactions  # A list of InvestmentTransaction objects
-
-# Transaction
-# O cabecalho da planilha eh o seguinte
-"""Nome | Saldo  atual | Conta | Transferencia | Descricao | Beneficiario | Categoria | Data | Tempo | Valor | Cambio | Numero do cheque | Saldo"""
-
-rows = []
-for transaction in statement.transactions:
-    # print(date_time)
-    rows.append(('', '', institution.organization + " " + account.number, '',
-                 transaction.memo, '', '', transaction.date,
-                 transaction.amount, '', 'BRL', ''))
-
-    # print(transaction.payee)
-    # print(transaction.type)
-    # print(transaction.date)
-    # transaction.user_date
-    # print(transaction.amount)
-    # print(transaction.id)
-    # print(transaction.memo)
-    # print(transaction.sic)
-    # print(transaction.mcc)
-    # print(transaction.checknum)
-
-for i in rows:
-    print(i)
-
-""""""""""""""""""""""""""""""
-""" Inserindo dados no CSV """
-""""""""""""""""""""""""""""""
-"""
-if os.path.exists('dados.csv'):
-    with open('dados.csv', 'a', newline='', encoding='utf-8') as arq:
-        dados = csv.writer(arq, lineterminator='\n', delimiter=';')
-        dados.writerows(rows)
-else:
-    with open('dados.csv', 'w') as arq:
-        dados = csv.writer(arq, lineterminator='\n', delimiter=';')
-        dados.writerow(
-            ['Nome', 'Saldo atual', 'Conta', 'Transferências', 'Descrição', 'Beneficiário', 'Categoria',
-             'Data', 'Tempo', 'Valor', 'Câmbio', 'Número do cheque', 'Saldo'])
-        dados.writerows(rows)
-"""
-""""""""""""""""""""""""""""""""
-""" Inserindo dados no EXCEL """
-""""""""""""""""""""""""""""""""
-
-wb = load_workbook('controle.xlsx')
-print(wb.sheetnames)
-wb1 = wb["Fluxo_Caixa"]
-
-
-for x in range(1, len(rows)):
-    for y in range(1, len(rows[x])):
-        wb1.cell(row=x, column=y, value=rows[x][y])
-
-wb.save("C:/Users/paulo.passos/PycharmProjects/ControleFinanceiro/controle.xlsx")
-
-
-
-"""
-#n = 0
-#wb = openpyxl.load_workbook('D:\excel.xlsx')
-#sheets = wb.sheetnames
-#ws = wb[sheets[n]]
-
-"""
+if __name__ == "__main__":
+    main()
